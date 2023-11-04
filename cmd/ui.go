@@ -57,6 +57,12 @@ func main() {
 		lAddress, eAddress,
 		lCreateAcc, bCreateAcc,
 	)
-	myWindow.SetContent(grid)
+
+	tabs := container.NewAppTabs(
+		container.NewTabItem("account.form", grid),
+		container.NewTabItem("account.list", widget.NewLabel("TODO")),
+	)
+
+	myWindow.SetContent(tabs)
 	myWindow.ShowAndRun()
 }
