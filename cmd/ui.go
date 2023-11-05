@@ -1,18 +1,40 @@
 package main
 
 import (
-	"fmt"
+	"os"
 
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+	"go.uber.org/zap"
 
-	"github.com/deut/garage-accounting/internal/types"
+	"github.com/deut/garage-accounting/db"
+	"github.com/deut/garage-accounting/internal/models"
 )
 
+const DBName = "garage.db"
+
 func main() {
+	logger, _ := zap.NewProduction()
+	defer logger.Sync() // flushes buffer, if any
+	sugar := logger.Sugar()
+
+	err := db.Connect("garage.db")
+	if err != nil {
+		sugar.Errorf("db connection error: %v", err)
+		os.Exit(1)
+	}
+
+	sugar.Info("initializing DB schema")
+	a := models.Account{}
+	err = a.InitSchema()
+	if err != nil {
+		sugar.Errorf("intet account schema error: %v", err)
+		os.Exit(1)
+	}
+
 	myApp := app.New()
 	myWindow := myApp.NewWindow("app.name")
 
@@ -38,14 +60,17 @@ func main() {
 
 	lCreateAcc := widget.NewLabel("account.create_account")
 	bCreateAcc := widget.NewButton("account.create_account", func() {
-		acc := types.Account{}
+		acc := models.Account{}
 		acc.GarageNumber, _ = garageNum.Get()
 		acc.FirstName, _ = firstName.Get()
 		acc.LastName, _ = lastName.Get()
 		acc.PhoneNumber, _ = phone.Get()
 		acc.Address, _ = address.Get()
 
-		fmt.Println(acc)
+		err = acc.Insert()
+		if err != nil {
+			sugar.Error("db inserttion error:", zap.Error(err))
+		}
 	})
 
 	grid := container.New(
