@@ -3,18 +3,17 @@ package main
 import (
 	"os"
 
-	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/data/binding"
-	"fyne.io/fyne/v2/layout"
-	"fyne.io/fyne/v2/widget"
 	"go.uber.org/zap"
 
 	"github.com/deut/garage-accounting/db"
+	"github.com/deut/garage-accounting/internal/app/ui"
 	"github.com/deut/garage-accounting/internal/models"
 )
 
-const DBName = "garage.db"
+const (
+	DBName = "garage.db"
+)
 
 func main() {
 	logger, _ := zap.NewProduction()
@@ -35,59 +34,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	myApp := app.New()
-	myWindow := myApp.NewWindow("app.name")
-
-	garageNum := binding.NewString()
-	lGarageNum := widget.NewLabel("account.garage_number")
-	eGarageNum := widget.NewEntryWithData(garageNum)
-
-	firstName := binding.NewString()
-	lFirstName := widget.NewLabel("account.first_name")
-	eFirstName := widget.NewEntryWithData(firstName)
-
-	lastName := binding.NewString()
-	lLastName := widget.NewLabel("account.last_name")
-	eLastName := widget.NewEntryWithData(lastName)
-
-	phone := binding.NewString()
-	lPhone := widget.NewLabel("account.phone")
-	ePhone := widget.NewEntryWithData(phone)
-
-	address := binding.NewString()
-	lAddress := widget.NewLabel("account.address")
-	eAddress := widget.NewEntryWithData(address)
-
-	lCreateAcc := widget.NewLabel("account.create_account")
-	bCreateAcc := widget.NewButton("account.create_account", func() {
-		acc := models.Account{}
-		acc.GarageNumber, _ = garageNum.Get()
-		acc.FirstName, _ = firstName.Get()
-		acc.LastName, _ = lastName.Get()
-		acc.PhoneNumber, _ = phone.Get()
-		acc.Address, _ = address.Get()
-
-		err = acc.Insert()
-		if err != nil {
-			sugar.Error("db inserttion error:", zap.Error(err))
-		}
-	})
-
-	grid := container.New(
-		layout.NewFormLayout(),
-		lGarageNum, eGarageNum,
-		lFirstName, eFirstName,
-		lLastName, eLastName,
-		lPhone, ePhone,
-		lAddress, eAddress,
-		lCreateAcc, bCreateAcc,
-	)
+	appLayout := ui.NewLayout("app.name")
+	acc := models.Account{}
+	accForm := ui.NewCreateAccountForm(appLayout.MainWindow, &acc)
+	listAccs := ui.NewAccountsList(appLayout.MainWindow)
 
 	tabs := container.NewAppTabs(
-		container.NewTabItem("account.form", grid),
-		container.NewTabItem("account.list", widget.NewLabel("TODO")),
+		container.NewTabItem("create.account", accForm.Build()),
+		container.NewTabItem("list.account", listAccs.Build()),
 	)
 
-	myWindow.SetContent(tabs)
-	myWindow.ShowAndRun()
+	appLayout.SetContent(tabs)
+	appLayout.ShowMainWindow()
 }

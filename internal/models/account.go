@@ -3,9 +3,10 @@ package models
 import (
 	"fmt"
 
+	"gorm.io/gorm"
+
 	"github.com/deut/garage-accounting/db"
 	"github.com/go-playground/validator/v10"
-	"gorm.io/gorm"
 )
 
 type Account struct {
@@ -15,6 +16,17 @@ type Account struct {
 	LastName     string `validate:"required" gorm:"not null"`
 	PhoneNumber  string
 	Address      string
+}
+
+func (a *Account) GetAll() ([]Account, error) {
+	accs := []Account{}
+	err := db.DB.Find(&accs).Error
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot load account: %w", err)
+	}
+
+	return accs, nil
 }
 
 func (a *Account) Insert() error {

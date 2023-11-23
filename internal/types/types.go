@@ -4,6 +4,8 @@ import (
 	"gorm.io/gorm"
 )
 
+const MSG = "msg"
+
 type Account struct {
 	gorm.Model
 	ID           int
