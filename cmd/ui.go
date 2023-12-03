@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"go.uber.org/zap"
 
@@ -34,16 +35,22 @@ func main() {
 		os.Exit(1)
 	}
 
-	appLayout := ui.NewLayout("app.name")
+	appLayout := ui.NewUI("app.name", 500, 480)
 	acc := models.Account{}
 	accForm := ui.NewCreateAccountForm(appLayout.MainWindow, &acc)
 	listAccs := ui.NewAccountsList(appLayout.MainWindow)
 
-	tabs := container.NewAppTabs(
-		container.NewTabItem("create.account", accForm.Build()),
-		container.NewTabItem("list.account", listAccs.Build()),
-	)
+	accFormCanvasObj := accForm.Build()
+	accListObj := listAccs.Build()
+	accListObj.Resize(fyne.NewSize(accFormCanvasObj.Size().Width, 1000))
+	accListObj.Refresh()
 
-	appLayout.SetContent(tabs)
+	formTab := container.NewTabItem("form", accFormCanvasObj)
+	listTab := container.NewTabItem("main", accListObj)
+
+	cont := container.NewAppTabs(listTab, formTab)
+
+	appLayout.SetContent(cont)
 	appLayout.ShowMainWindow()
+
 }

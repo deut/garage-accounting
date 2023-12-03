@@ -31,23 +31,45 @@ func (al *AccountsList) Build() fyne.CanvasObject {
 		row = append(row, a.LastName)
 		row = append(row, a.PhoneNumber)
 		row = append(row, a.Address)
+		row = append(row, "")
 
 		accsTableContent = append(accsTableContent, row)
 
 	}
 
-	fmt.Println(accsTableContent)
-
-	list := widget.NewTableWithHeaders(
+	table := widget.NewTable(
 		func() (int, int) {
 			return len(accsTableContent), len(accsTableContent[0])
 		},
 		func() fyne.CanvasObject {
-			return widget.NewLabel("wide content")
+			return widget.NewLabel("")
 		},
 		func(i widget.TableCellID, o fyne.CanvasObject) {
-			// o.(*widget.).SetText(accsTableContent[i.Row][i.Col])
+			o.(*widget.Label).SetText(accsTableContent[i.Row][i.Col])
 		})
 
-	return list
+	header := []string{"ID", "GarageNumber", "FirstName", "LastName", "PhoneNumber", "Address", ""}
+	table.CreateHeader = func() fyne.CanvasObject { return widget.NewEntry() }
+	table.UpdateHeader = func(id widget.TableCellID, template fyne.CanvasObject) {
+		entry := template.(*widget.Entry)
+		entry.SetPlaceHolder(header[id.Col])
+		entry.OnChanged = func(s string) {
+			// TODO: Search here
+			fmt.Println(s, fmt.Sprintf(", Changed: %v", id))
+		}
+	}
+	table.ShowHeaderRow = true
+
+	// table.Cl = func(id widget.TableCellID) {
+	// 	for i := range header {
+	// 		table.Select(widget.TableCellID{Col: id.Col, Row: i})
+	// 	}
+	// }
+
+	for i, h := range header {
+		width := float32(18 * len(h))
+		table.SetColumnWidth(i, width)
+	}
+
+	return table
 }
