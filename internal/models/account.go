@@ -14,12 +14,16 @@ type Account struct {
 	GarageNumber string `validate:"required" gorm:"index:idx_garage_number,unique"`
 	FirstName    string `validate:"required" gorm:"not null"`
 	LastName     string `validate:"required" gorm:"not null"`
+	Credit       float32
+	Debit        float32
 	PhoneNumber  string
 	Address      string
 }
 
-func (a *Account) GetAll() ([]Account, error) {
-	accs := []Account{}
+type Accounts []Account
+
+func (a *Account) GetAll() (Accounts, error) {
+	accs := Accounts{}
 	err := db.DB.Find(&accs).Error
 
 	if err != nil {

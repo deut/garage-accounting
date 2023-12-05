@@ -14,6 +14,12 @@ type AccountsList struct {
 	Window fyne.Window
 }
 
+type tableHeader struct {
+	placeholder  string
+	text         string
+	isSearchable bool
+}
+
 func NewAccountsList(w fyne.Window) AccountsList {
 	return AccountsList{Window: w}
 }
@@ -42,32 +48,51 @@ func (al *AccountsList) Build() fyne.CanvasObject {
 			return len(accsTableContent), len(accsTableContent[0])
 		},
 		func() fyne.CanvasObject {
-			return widget.NewLabel("")
+			l := widget.NewLabel("")
+
+			return l
 		},
 		func(i widget.TableCellID, o fyne.CanvasObject) {
 			o.(*widget.Label).SetText(accsTableContent[i.Row][i.Col])
 		})
 
-	header := []string{"ID", "GarageNumber", "FirstName", "LastName", "PhoneNumber", "Address", ""}
+	headers := []tableHeader{
+		{placeholder: "", text: "ID", isSearchable: false},
+		{placeholder: "GarageNumber", text: "", isSearchable: true},
+		{placeholder: "FirstName", text: "", isSearchable: true},
+		{placeholder: "LastName", text: "", isSearchable: true},
+		{placeholder: "PhoneNumber", text: "", isSearchable: true},
+		{placeholder: "", text: "Address", isSearchable: false},
+		{placeholder: "", text: "", isSearchable: false},
+	}
+
 	table.CreateHeader = func() fyne.CanvasObject { return widget.NewEntry() }
 	table.UpdateHeader = func(id widget.TableCellID, template fyne.CanvasObject) {
 		entry := template.(*widget.Entry)
-		entry.SetPlaceHolder(header[id.Col])
-		entry.OnChanged = func(s string) {
-			// TODO: Search here
-			fmt.Println(s, fmt.Sprintf(", Changed: %v", id))
+		if headers[id.Col].isSearchable {
+			entry.SetPlaceHolder("🔍  " + headers[id.Col].placeholder)
+			// entry.ActionItem = canvas.NewImageFromResource(theme.QuestionIcon())
+			// entry.Refresh()
+			// entry.ActionItem.Show()
+			entry.OnChanged = func(s string) {
+				// TODO: Search here
+				fmt.Println(s, fmt.Sprintf(", Changed: %v", id))
+			}
+		} else {
+			entry.SetText(headers[id.Col].text)
+			entry.Disable()
 		}
 	}
+
 	table.ShowHeaderRow = true
 
-	// table.Cl = func(id widget.TableCellID) {
-	// 	for i := range header {
-	// 		table.Select(widget.TableCellID{Col: id.Col, Row: i})
-	// 	}
-	// }
-
-	for i, h := range header {
-		width := float32(18 * len(h))
+	for i, h := range headers {
+		var width float32
+		if h.isSearchable {
+			width = float32(18 * len(h.placeholder))
+		} else {
+			width = float32(18 * len(h.text))
+		}
 		table.SetColumnWidth(i, width)
 	}
 
