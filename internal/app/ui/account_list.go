@@ -1,17 +1,15 @@
 package ui
 
 import (
-	"fmt"
-	"strconv"
-
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
-
-	"github.com/deut/garage-accounting/internal/models"
+	"github.com/deut/garage-accounting/internal/services"
 )
 
 type AccountsList struct {
-	Window fyne.Window
+	Window          fyne.Window
+	accountsService *services.Account
 }
 
 type tableHeader struct {
@@ -21,26 +19,14 @@ type tableHeader struct {
 }
 
 func NewAccountsList(w fyne.Window) AccountsList {
-	return AccountsList{Window: w}
+	return AccountsList{Window: w, accountsService: services.New()}
 }
 
 func (al *AccountsList) Build() fyne.CanvasObject {
-	acc := models.Account{}
-	accs, _ := acc.GetAll()
-
-	accsTableContent := make([][]string, 0, len(accs))
-	for _, a := range accs {
-		row := make([]string, 0, 6)
-		row = append(row, strconv.FormatUint(uint64(a.ID), 10))
-		row = append(row, a.GarageNumber)
-		row = append(row, a.FirstName)
-		row = append(row, a.LastName)
-		row = append(row, a.PhoneNumber)
-		row = append(row, a.Address)
-		row = append(row, "")
-
-		accsTableContent = append(accsTableContent, row)
-
+	accsTableContent, err := al.accountsService.Search()
+	if err != nil {
+		dialog.NewError(err, al.Window).Show()
+		accsTableContent = [][]string{}
 	}
 
 	table := widget.NewTable(
@@ -71,12 +57,8 @@ func (al *AccountsList) Build() fyne.CanvasObject {
 		entry := template.(*widget.Entry)
 		if headers[id.Col].isSearchable {
 			entry.SetPlaceHolder("🔍  " + headers[id.Col].placeholder)
-			// entry.ActionItem = canvas.NewImageFromResource(theme.QuestionIcon())
-			// entry.Refresh()
-			// entry.ActionItem.Show()
 			entry.OnChanged = func(s string) {
-				// TODO: Search here
-				fmt.Println(s, fmt.Sprintf(", Changed: %v", id))
+
 			}
 		} else {
 			entry.SetText(headers[id.Col].text)
@@ -94,6 +76,21 @@ func (al *AccountsList) Build() fyne.CanvasObject {
 			width = float32(18 * len(h.text))
 		}
 		table.SetColumnWidth(i, width)
+	}
+
+	table.OnSelected = func(id widget.TableCellID) {
+		table.UnselectAll()
+		dialog.NewForm(
+			"receipt",
+			"checkout",
+			"cancel",
+			[]*widget.FormItem{
+				widget.NewFormItem("summ", widget.NewEntry()),
+				widget.NewFormItem("type", widget.NewSelectEntry([]string{"rent", "electicity"})),
+			},
+			func(b bool) {},
+			al.Window,
+		).Show()
 	}
 
 	return table
