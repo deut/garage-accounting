@@ -26,8 +26,7 @@ func NewCreateAccountForm(w fyne.Window, a *models.Account) CreateAccountForm {
 
 func (caf *CreateAccountForm) Build() fyne.CanvasObject {
 	garageNumBind := binding.NewString()
-	firstNameBind := binding.NewString()
-	lastNameBind := binding.NewString()
+	fullNameBind := binding.NewString()
 	phoneBind := binding.NewString()
 	addressBind := binding.NewString()
 
@@ -40,18 +39,9 @@ func (caf *CreateAccountForm) Build() fyne.CanvasObject {
 
 		return nil
 	}
-	firstNameText := widget.NewEntryWithData(firstNameBind)
-	firstNameText.PlaceHolder = "firstNameText"
-	firstNameText.Validator = func(s string) error {
-		if s == "" {
-			return errors.New("should not be blank")
-		}
-
-		return nil
-	}
-	lastNameText := widget.NewEntryWithData(lastNameBind)
-	lastNameText.PlaceHolder = "lastNameText"
-	lastNameText.Validator = func(s string) error {
+	fullNameText := widget.NewEntryWithData(fullNameBind)
+	fullNameText.PlaceHolder = "firstNameText"
+	fullNameText.Validator = func(s string) error {
 		if s == "" {
 			return errors.New("should not be blank")
 		}
@@ -83,11 +73,7 @@ func (caf *CreateAccountForm) Build() fyne.CanvasObject {
 			return
 		}
 
-		if err := firstNameText.Validate(); err != nil {
-			return
-		}
-
-		if err := lastNameText.Validate(); err != nil {
+		if err := fullNameText.Validate(); err != nil {
 			return
 		}
 
@@ -99,24 +85,18 @@ func (caf *CreateAccountForm) Build() fyne.CanvasObject {
 			return
 		}
 
-		defer func() {
-			if err != nil {
-				dialog.NewError(err, caf.Window).Show()
-			}
-		}()
+		if err != nil {
+			dialog.NewError(err, caf.Window).Show()
+		}
+
 		caf.Account.GarageNumber, err = garageNumBind.Get()
 		if err != nil {
 			err = fmt.Errorf("garageNumBind error: %w", err)
 			return
 		}
-		caf.Account.FirstName, err = firstNameBind.Get()
+		caf.Account.FullName, err = fullNameBind.Get()
 		if err != nil {
-			err = fmt.Errorf("firstNameBind error: %w", err)
-			return
-		}
-		caf.Account.LastName, err = lastNameBind.Get()
-		if err != nil {
-			err = fmt.Errorf("lastNameBind error: %w", err)
+			err = fmt.Errorf("fullNameBind error: %w", err)
 			return
 		}
 		caf.Account.PhoneNumber, err = phoneBind.Get()
@@ -138,8 +118,7 @@ func (caf *CreateAccountForm) Build() fyne.CanvasObject {
 
 	layout := container.New(
 		layout.NewGridLayoutWithColumns(5),
-		firstNameText,
-		lastNameText,
+		fullNameText,
 		phoneText,
 		addressText,
 		submitBtn,
