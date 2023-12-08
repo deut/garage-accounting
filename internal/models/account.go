@@ -25,16 +25,16 @@ func ByID(v string) func() (string, string) {
 }
 
 func ByGarageNumber(v string) func() (string, string) {
-	return func() (string, string) { return "garage_number LIKE '%?%'", v }
+	return func() (string, string) { return "garage_number LIKE ?", "%" + v + "%" }
 }
 
 func ByFullName(v string) func() (string, string) {
-	return func() (string, string) { return "full_name LIKE '%?%'", v }
+	return func() (string, string) { return "full_name LIKE ?", "%" + v + "%" }
 
 }
 
 func ByPhoneNumber(v string) func() (string, string) {
-	return func() (string, string) { return "phone_number LIKE '%?%'", v }
+	return func() (string, string) { return "phone_number LIKE ?", "%" + v + "%" }
 }
 
 func Fileds() []string {
@@ -43,12 +43,13 @@ func Fileds() []string {
 
 func (a *Account) GetAll(params ...searchParams) (Accounts, error) {
 	accs := Accounts{}
-	m := db.DB.Model(Account{})
+	m := db.DB.Debug().Model(Account{})
 
 	for _, sp := range params {
 		m = m.Where(sp())
 	}
 
+	fmt.Println(m.ToSQL(func(tx *gorm.DB) *gorm.DB { return db.DB }))
 	err := m.Find(&accs).Error
 
 	if err != nil {

@@ -40,7 +40,7 @@ func (caf *CreateAccountForm) Build() fyne.CanvasObject {
 		return nil
 	}
 	fullNameText := widget.NewEntryWithData(fullNameBind)
-	fullNameText.PlaceHolder = "firstNameText"
+	fullNameText.PlaceHolder = "fullNameText"
 	fullNameText.Validator = func(s string) error {
 		if s == "" {
 			return errors.New("should not be blank")
@@ -70,23 +70,18 @@ func (caf *CreateAccountForm) Build() fyne.CanvasObject {
 	var err error
 	submitBtn := widget.NewButton("createAccount", func() {
 		if err := garageNumText.Validate(); err != nil {
+			dialog.NewError(err, caf.Window).Show()
 			return
 		}
 
 		if err := fullNameText.Validate(); err != nil {
+			dialog.NewError(err, caf.Window).Show()
 			return
 		}
 
 		if err := phoneText.Validate(); err != nil {
-			return
-		}
-		addressText.Validate()
-		if err := garageNumText.Validate(); err != nil {
-			return
-		}
-
-		if err != nil {
 			dialog.NewError(err, caf.Window).Show()
+			return
 		}
 
 		caf.Account.GarageNumber, err = garageNumBind.Get()
@@ -117,7 +112,8 @@ func (caf *CreateAccountForm) Build() fyne.CanvasObject {
 	})
 
 	layout := container.New(
-		layout.NewGridLayoutWithColumns(5),
+		layout.NewGridLayout(5),
+		garageNumText,
 		fullNameText,
 		phoneText,
 		addressText,

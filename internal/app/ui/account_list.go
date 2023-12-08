@@ -41,26 +41,20 @@ func (al *AccountsList) Build() fyne.CanvasObject {
 	}
 
 	table := &widget.Table{}
-	if len(accsTableContent) > 0 {
-		table = widget.NewTable(
-			func() (int, int) {
+	table = widget.NewTable(
+		func() (int, int) {
+			if len(accsTableContent) > 0 {
 				return len(accsTableContent), len(accsTableContent[0])
-			},
-			func() fyne.CanvasObject {
-				l := widget.NewLabel("")
-
-				return l
-			},
-			func(i widget.TableCellID, o fyne.CanvasObject) {
+			} else {
+				return 0, len(headers)
+			}
+		},
+		func() fyne.CanvasObject { return widget.NewLabel("") },
+		func(i widget.TableCellID, o fyne.CanvasObject) {
+			if len(accsTableContent) > 0 {
 				o.(*widget.Label).SetText(accsTableContent[i.Row][i.Col])
-			})
-	} else {
-		table = widget.NewTable(
-			func() (int, int) { return 0, len(headers) },
-			func() fyne.CanvasObject { return widget.NewLabel("") },
-			func(i widget.TableCellID, o fyne.CanvasObject) {},
-		)
-	}
+			}
+		})
 
 	table.CreateHeader = func() fyne.CanvasObject { return widget.NewEntry() }
 	table.UpdateHeader = func(id widget.TableCellID, template fyne.CanvasObject) {
@@ -68,7 +62,11 @@ func (al *AccountsList) Build() fyne.CanvasObject {
 		if headers[id.Col].isSearchable {
 			entry.SetPlaceHolder("🔍  " + headers[id.Col].placeholder)
 			entry.OnChanged = func(s string) {
-				r, err := al.accountsService.Search(headers[id.Col].searchKey, s)
+
+				table.UpdateHeader
+
+				header := headers[id.Col]
+				r, err := al.accountsService.Search(header.searchKey, s)
 
 				if err != nil {
 					dialog.NewError(err, al.Window).Show()
