@@ -53,13 +53,14 @@ func (a *Account) Search(field, value string) ([][]string, error) {
 	return toTable(accs), nil
 }
 
-func (a *Account) Create(garageNum, FullName, phone, address string, balans float32) error {
+func (a *Account) Create(garageNum, FullName, phone, address string, debt float32, electricityNumber int) error {
 	a.model = models.Account{
-		GarageNumber: garageNum,
-		FullName:     FullName,
-		PhoneNumber:  phone,
-		Address:      address,
-		Balans:       balans,
+		GarageNumber:      garageNum,
+		FullName:          FullName,
+		PhoneNumber:       phone,
+		Address:           address,
+		Debt:              debt,
+		ElectricityNumber: electricityNumber,
 	}
 
 	validate := validator.New()
@@ -86,7 +87,8 @@ func toTable(accs models.Accounts) [][]string {
 			a.FullName,
 			a.PhoneNumber,
 			a.Address,
-			fmt.Sprintf("%.2f", a.Balans),
+			fmt.Sprintf("%.2f", a.Debt),
+			strconv.FormatUint(uint64(a.ID), 10),
 		}
 
 		table = append(table, t)

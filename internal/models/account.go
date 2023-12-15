@@ -10,11 +10,13 @@ import (
 
 type Account struct {
 	gorm.Model
-	GarageNumber string `validate:"required" gorm:"index:idx_garage_number,unique"`
-	FullName     string `validate:"required" gorm:"not null"`
-	Balans       float32
-	PhoneNumber  string
-	Address      string
+	GarageNumber      string `validate:"required" gorm:"index:idx_garage_number,unique"`
+	FullName          string `validate:"required" gorm:"not null"`
+	PhoneNumber       string
+	Address           string
+	Debt              float32
+	ElectricityNumber int
+	Payments          []Payment `gorm:"foreignKey:AccountID"`
 }
 
 type Accounts []Account
@@ -30,15 +32,10 @@ func ByGarageNumber(v string) func() (string, string) {
 
 func ByFullName(v string) func() (string, string) {
 	return func() (string, string) { return "full_name LIKE ?", "%" + v + "%" }
-
 }
 
 func ByPhoneNumber(v string) func() (string, string) {
 	return func() (string, string) { return "phone_number LIKE ?", "%" + v + "%" }
-}
-
-func Fileds() []string {
-	return []string{"ID", "GarageNumber", "FullName", "PhoneNumber", "Address", "Balans"}
 }
 
 func (a *Account) GetAll(params ...searchParams) (Accounts, error) {
@@ -63,15 +60,6 @@ func (a *Account) Insert() error {
 	err := db.DB.Create(a).Error
 	if err != nil {
 		return fmt.Errorf("cannot create account record: %w", err)
-	}
-
-	return nil
-}
-
-func (a *Account) InitSchema() error {
-	err := db.DB.AutoMigrate(a)
-	if err != nil {
-		return fmt.Errorf("cannot create schema: %w", err)
 	}
 
 	return nil
