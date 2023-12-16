@@ -8,7 +8,6 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 
 	"github.com/deut/garage-accounting/internal/models"
@@ -111,14 +110,8 @@ func (caf *CreateAccountForm) Build() fyne.CanvasObject {
 		}
 	})
 
-	layout := container.New(
-		layout.NewGridLayout(5),
-		garageNumText,
-		fullNameText,
-		phoneText,
-		addressText,
-		submitBtn,
+	return container.NewGridWithRows(2,
+		container.NewGridWithRows(5, garageNumText, fullNameText, phoneText, addressText, submitBtn),
+		widget.NewSeparator(),
 	)
-
-	return layout
 }

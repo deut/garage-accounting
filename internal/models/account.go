@@ -56,6 +56,15 @@ func (a *Account) GetAll(params ...searchParams) (Accounts, error) {
 	return accs, nil
 }
 
+func (a *Account) FindByID(id int) (*Account, error) {
+	err := db.DB.Find(a).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return a, nil
+}
+
 func (a *Account) Insert() error {
 	err := db.DB.Create(a).Error
 	if err != nil {

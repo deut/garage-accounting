@@ -81,6 +81,31 @@ func (al *AccountsList) Build() fyne.CanvasObject {
 						b.SetText("edit")
 					case 1:
 						b.SetText("receipt")
+						valueW := widget.NewEntry()
+						valueW.SetPlaceHolder("amount")
+
+						b.OnTapped = func() {
+							yearW := widget.NewSelect([]string{"2022", "2023"}, func(s string) {
+								valueW.SetText(s)
+							})
+
+							accountIDw := widget.NewEntry()
+							accountIDw.SetText(accsTableContent[i.Row][0])
+							accountIDw.Hide()
+							formItems := []*widget.FormItem{
+								widget.NewFormItem("", yearW),
+								widget.NewFormItem("", valueW),
+								widget.NewFormItem("", accountIDw),
+							}
+							dialog.NewForm(
+								"Receipt",
+								"create",
+								"cancel",
+								formItems,
+								func(bool) {},
+								al.Window,
+							).Show()
+						}
 					}
 				}
 			}
