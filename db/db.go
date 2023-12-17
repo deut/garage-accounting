@@ -22,3 +22,16 @@ func Connect(dbName string) error {
 
 	return nil
 }
+
+func SeedRates() error {
+	DB.Debug().Exec(
+		`
+		INSERT INTO 'rates' ('year', 'value') VALUES
+		('2015', 300.00),
+		('2016', 400.00),
+		('2017', 500.00),
+		('2018', 600.00),
+		`,
+	)
+	return nil
+}

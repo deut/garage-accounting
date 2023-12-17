@@ -40,7 +40,7 @@ func ByPhoneNumber(v string) func() (string, string) {
 
 func (a *Account) GetAll(params ...searchParams) (Accounts, error) {
 	accs := Accounts{}
-	m := db.DB.Debug().Model(Account{})
+	m := db.DB.Debug().Model(Account{}).Preload("Payments")
 
 	for _, sp := range params {
 		m = m.Where(sp())

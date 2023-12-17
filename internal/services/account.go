@@ -88,7 +88,8 @@ func toTable(accs models.Accounts) [][]string {
 			a.PhoneNumber,
 			a.Address,
 			fmt.Sprintf("%.2f", a.Debt),
-			strconv.FormatUint(uint64(a.ID), 10),
+			fmt.Sprintf("%d", a.ID),
+			fmt.Sprintf("%d", len(a.Payments)),
 		}
 
 		table = append(table, t)

@@ -27,8 +27,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	sugar.Info("initializing DB schema")
-	db.DB.AutoMigrate(&models.Account{}, &models.Payment{}, &models.Rate{})
+	if os.ReadFile("garage.db"); err != nil {
+		sugar.Info("initializing DB schema")
+		db.DB.AutoMigrate(&models.Account{}, &models.Payment{}, &models.Rate{})
+	}
 
 	if err != nil {
 		sugar.Errorf("intet account schema error: %v", err)
