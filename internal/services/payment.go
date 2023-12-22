@@ -8,15 +8,17 @@ import (
 )
 
 type Payment struct {
-	Account *models.Account
-	Rate    *models.Rate
-	Payment *models.Payment
+	payment *models.Payment
 }
 
-func InitPayment(accountID, year, paymentValue string) (*Payment, error) {
+func NewPayment() *Payment {
+	return &Payment{payment: &models.Payment{}}
+}
+
+func (p *Payment) Pay(accountID, year, paymentValue string) (*models.Payment, error) {
 	id, err := strconv.Atoi(accountID)
 	if err != nil {
-		return nil, fmt.Errorf("worong accountID (%s) has wrong value: %w", accountID, err)
+		return nil, fmt.Errorf("wrong accountID (%s) has wrong value: %w", accountID, err)
 	}
 
 	acc := &models.Account{}
@@ -31,5 +33,13 @@ func InitPayment(accountID, year, paymentValue string) (*Payment, error) {
 		return nil, fmt.Errorf("rate with year = %s is not found: %w", year, err)
 	}
 
-	return &Payment{Account: acc}, nil
+	value, err := strconv.ParseFloat(paymentValue, 64)
+	if err != nil {
+		return nil, fmt.Errorf("wrong float value %s", paymentValue)
+	}
+
+	payment := &models.Payment{Account: *acc, Rate: *rate, Value: float32(value)}
+	payment.Create(acc, rate, float32(value))
+
+	return payment, nil
 }

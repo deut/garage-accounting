@@ -12,7 +12,6 @@ import (
 type AccountsList struct {
 	Window              fyne.Window
 	accountsService     *services.Account
-	rateService         *services.Rate
 	contantTableHeaders []tableHeader
 	table               *widget.Table
 }

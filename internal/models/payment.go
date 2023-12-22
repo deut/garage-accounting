@@ -16,12 +16,12 @@ type Payment struct {
 	Value     float32
 }
 
-func (p *Payment) Create(a Account, r Rate, value float32) (*Payment, error) {
-	p.Account = a
-	p.Rate = r
+func (p *Payment) Create(a *Account, r *Rate, value float32) (*Payment, error) {
+	p.AccountID = int(a.ID)
+	p.RateID = int(r.ID)
 	p.Value = value
 
-	err := db.DB.Debug().Create(r).Error
+	err := db.DB.Debug().Create(p).Error
 
 	return p, fmt.Errorf("cannot create payment: %w", err)
 }
