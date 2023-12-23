@@ -12,6 +12,10 @@ var DB *gorm.DB
 func Connect(dbName string) error {
 	var err error
 	DB, err = gorm.Open(sqlite.Open(dbName), &gorm.Config{})
+
+	// TODO: make it configurable
+	DB = DB.Debug()
+
 	if err != nil {
 		return fmt.Errorf("failed to open SQLite connection: %w", err)
 	}

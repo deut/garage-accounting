@@ -21,7 +21,16 @@ func (p *Payment) Create(a *Account, r *Rate, value float32) (*Payment, error) {
 	p.RateID = int(r.ID)
 	p.Value = value
 
-	err := db.DB.Debug().Create(p).Error
+	err := db.DB.Create(p).Error
 
 	return p, fmt.Errorf("cannot create payment: %w", err)
+}
+
+func (p *Payment) All(accountID int) ([]Payment, error) {
+	payments := []Payment{}
+	err := db.DB.Find(&payments, "AccountID = ?", accountID).Preload("Rate").Error
+	if err != nil {
+		return nil, fmt.Errorf("cannot find payments: %w", err)
+	}
+	return payments, nil
 }

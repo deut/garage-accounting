@@ -43,3 +43,22 @@ func (p *Payment) Pay(accountID, year, paymentValue string) (*models.Payment, er
 
 	return payment, nil
 }
+
+func (p *Payment) ListPayments(accountID string) ([]float32, error) {
+	id, err := strconv.Atoi(accountID)
+	if err != nil {
+		return nil, fmt.Errorf("accountID is incorrect: %w", err)
+	}
+
+	paymentsRecords, err := p.payment.All(id)
+	if err != nil {
+		return nil, fmt.Errorf("error loading payments: %w", err)
+	}
+
+	payments := []float32{}
+	for _, pr := range paymentsRecords {
+		payments = append(payments, pr.Value)
+	}
+
+	return payments, nil
+}

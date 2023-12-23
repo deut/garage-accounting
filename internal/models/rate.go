@@ -26,7 +26,7 @@ func (r *Rate) FindByYear(year string) (*Rate, error) {
 
 func (r *Rate) All() ([]Rate, error) {
 	var rates []Rate
-	err := db.DB.Debug().Find(&rates).Error
+	err := db.DB.Find(&rates).Error
 
 	if err != nil {
 		return nil, fmt.Errorf("cannot load rates: %w", err)

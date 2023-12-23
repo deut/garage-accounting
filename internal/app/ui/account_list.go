@@ -35,8 +35,7 @@ func NewAccountsList(w fyne.Window) AccountsList {
 			{placeholder: "", text: "Address", isSearchable: false},
 			{placeholder: "", text: "Debt", isSearchable: false},
 			{placeholder: "", text: "ElectricityNumber", isSearchable: false},
-			{placeholder: "", text: "paymentsCount", isSearchable: false},
-			{placeholder: "          ", text: "", isSearchable: false},
+			{placeholder: "", text: "lastPayedYear", isSearchable: false},
 			{placeholder: "          ", text: "", isSearchable: false},
 			{placeholder: "          ", text: "", isSearchable: false},
 		},
@@ -96,12 +95,9 @@ func (al *AccountsList) buildTableContentFunc(accsTableContent [][]string) func(
 					b.SetText("edit")
 				case 1:
 					b.SetText("receipt")
-
 					b.OnTapped = func() {
 						NewReceiptDialog(accsTableContent[i.Row][0], al.Window).Build().Show()
 					}
-				case 2:
-					b.SetText("listReceipts")
 				}
 			}
 		}

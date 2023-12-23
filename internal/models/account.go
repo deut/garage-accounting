@@ -40,7 +40,7 @@ func ByPhoneNumber(v string) func() (string, string) {
 
 func (a *Account) GetAll(params ...searchParams) (Accounts, error) {
 	accs := Accounts{}
-	m := db.DB.Debug().Model(Account{}).Preload("Payments")
+	m := db.DB.Model(Account{}).Preload("Payments.Rate")
 
 	for _, sp := range params {
 		m = m.Where(sp())
@@ -72,4 +72,19 @@ func (a *Account) Insert() error {
 	}
 
 	return nil
+}
+
+func (a *Account) LastPayedYear() string {
+	payments := a.Payments
+	lastPayment := (*Payment)(nil)
+	if len(payments) > 0 {
+		lastPayment = &a.Payments[len(payments)-1]
+
+	}
+
+	if lastPayment != nil {
+		return lastPayment.Rate.Year
+	} else {
+		return "No payments"
+	}
 }
