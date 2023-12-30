@@ -7,6 +7,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"go.uber.org/zap"
 
+	"github.com/deut/garage-accounting/config"
 	"github.com/deut/garage-accounting/db"
 	"github.com/deut/garage-accounting/internal/app/ui"
 	"github.com/deut/garage-accounting/internal/models"
@@ -21,13 +22,17 @@ func main() {
 	defer logger.Sync() // flushes buffer, if any
 	sugar := logger.Sugar()
 
-	err := db.Connect("garage.db")
+	sugar.Debug("Loading app")
+	config.Conf = &config.C{}
+	config.Conf.Defaults()
+
+	err := db.Connect(config.Conf.DBFileLocation)
 	if err != nil {
 		sugar.Errorf("db connection error: %v", err)
 		os.Exit(1)
 	}
 
-	if os.ReadFile("garage.db"); err != nil {
+	if os.ReadFile(config.Conf.DBFileLocation); err != nil {
 		sugar.Info("initializing DB schema")
 		db.DB.AutoMigrate(&models.Account{}, &models.Payment{}, &models.Rate{})
 	}

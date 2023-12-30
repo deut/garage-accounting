@@ -10,13 +10,13 @@ import (
 
 type Account struct {
 	model      models.Account
-	collection models.Accounts
+	collection []models.Account
 }
 
 func New() *Account {
 	return &Account{
 		model:      models.Account{},
-		collection: models.Accounts{},
+		collection: []models.Account{},
 	}
 }
 
@@ -30,7 +30,7 @@ func (a *Account) All() ([][]string, error) {
 }
 
 func (a *Account) Search(field, value string) ([][]string, error) {
-	var accs models.Accounts
+	var accs []models.Account
 	var err error
 
 	switch field {
@@ -78,7 +78,7 @@ func (a *Account) Create(garageNum, FullName, phone, address string, debt float3
 	return nil
 }
 
-func toTable(accs models.Accounts) [][]string {
+func toTable(accs []models.Account) [][]string {
 	table := [][]string{}
 	for _, a := range accs {
 		t := []string{

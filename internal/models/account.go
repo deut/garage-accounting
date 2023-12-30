@@ -19,7 +19,6 @@ type Account struct {
 	Payments          []Payment `gorm:"foreignKey:AccountID"`
 }
 
-type Accounts []Account
 type searchParams func() (string, string)
 
 func ByID(v string) func() (string, string) {
@@ -38,18 +37,15 @@ func ByPhoneNumber(v string) func() (string, string) {
 	return func() (string, string) { return "phone_number LIKE ?", "%" + v + "%" }
 }
 
-func (a *Account) GetAll(params ...searchParams) (Accounts, error) {
-	accs := Accounts{}
-	m := db.DB.Model(Account{}).Preload("Payments.Rate")
+func (a *Account) GetAll(params ...searchParams) ([]Account, error) {
+	accs := []Account{}
+	q := db.DB.Model(&Account{}).Preload("Payments.Rate").Find(&accs)
 
 	for _, sp := range params {
-		m = m.Where(sp())
+		q = q.Where(sp())
 	}
 
-	fmt.Println(m.ToSQL(func(tx *gorm.DB) *gorm.DB { return db.DB }))
-	err := m.Find(&accs).Error
-
-	if err != nil {
+	if err := q.Error; err != nil {
 		return nil, fmt.Errorf("cannot load account: %w", err)
 	}
 
