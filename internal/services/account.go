@@ -21,36 +21,43 @@ func New() *Account {
 }
 
 func (a *Account) All() ([][]string, error) {
-	accs, err := a.model.GetAll()
-	if err != nil {
-		return nil, err
+	var err error
+	if len(a.collection) == 0 {
+		a.collection, err = a.model.GetAll()
 	}
 
-	return toTable(accs), nil
+	return toTable(a.collection), err
 }
 
 func (a *Account) Search(field, value string) ([][]string, error) {
-	var accs []models.Account
+	var searchFunc models.SearchQueryFunc
 	var err error
+
+	if value == "" {
+		a.collection, err = a.model.GetAll()
+		return toTable(a.collection), err
+	}
 
 	switch field {
 	case "ID":
-		accs, err = a.model.GetAll(models.ByID(value))
+		searchFunc = models.ByID(value)
 	case "GarageNumber":
-		accs, err = a.model.GetAll(models.ByGarageNumber(value))
+		searchFunc = models.ByGarageNumber(value)
 	case "FullName":
-		accs, err = a.model.GetAll(models.ByFullName(value))
+		searchFunc = models.ByFullName(value)
 	case "PhoneNumber":
-		accs, err = a.model.GetAll(models.ByPhoneNumber(value))
+		searchFunc = models.ByPhoneNumber(value)
 	default:
 		return nil, fmt.Errorf("unknown search field: %s", field)
 	}
 
+	a.collection, err = a.model.Search(searchFunc)
+
 	if err != nil {
 		return nil, err
 	}
 
-	return toTable(accs), nil
+	return toTable(a.collection), nil
 }
 
 func (a *Account) Create(garageNum, FullName, phone, address string, debt float32, electricityNumber int) error {

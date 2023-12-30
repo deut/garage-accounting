@@ -19,34 +19,41 @@ type Account struct {
 	Payments          []Payment `gorm:"foreignKey:AccountID"`
 }
 
-type searchParams func() (string, string)
+type SearchQueryFunc func() (string, string)
 
-func ByID(v string) func() (string, string) {
+func ByID(v string) SearchQueryFunc {
 	return func() (string, string) { return "ID = ?", v }
 }
 
-func ByGarageNumber(v string) func() (string, string) {
+func ByGarageNumber(v string) SearchQueryFunc {
 	return func() (string, string) { return "garage_number LIKE ?", "%" + v + "%" }
 }
 
-func ByFullName(v string) func() (string, string) {
+func ByFullName(v string) SearchQueryFunc {
 	return func() (string, string) { return "full_name LIKE ?", "%" + v + "%" }
 }
 
-func ByPhoneNumber(v string) func() (string, string) {
+func ByPhoneNumber(v string) SearchQueryFunc {
 	return func() (string, string) { return "phone_number LIKE ?", "%" + v + "%" }
 }
 
-func (a *Account) GetAll(params ...searchParams) ([]Account, error) {
+func (a *Account) Search(sq SearchQueryFunc) ([]Account, error) {
+	accs := []Account{}
+	q := db.DB.Model(&Account{}).Preload("Payments.Rate").Where(sq())
+
+	if err := q.Find(&accs).Error; err != nil {
+		return nil, fmt.Errorf("cannot find accounts: %w", err)
+	}
+
+	return accs, nil
+}
+
+func (a *Account) GetAll() ([]Account, error) {
 	accs := []Account{}
 	q := db.DB.Model(&Account{}).Preload("Payments.Rate").Find(&accs)
 
-	for _, sp := range params {
-		q = q.Where(sp())
-	}
-
 	if err := q.Error; err != nil {
-		return nil, fmt.Errorf("cannot load account: %w", err)
+		return nil, fmt.Errorf("cannot load accounts: %w", err)
 	}
 
 	return accs, nil

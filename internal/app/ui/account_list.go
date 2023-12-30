@@ -14,6 +14,7 @@ type AccountsList struct {
 	accountsService     *services.Account
 	contantTableHeaders []tableHeader
 	table               *widget.Table
+	accsTableContent    [][]string
 }
 
 type tableHeader struct {
@@ -43,23 +44,24 @@ func NewAccountsList(w fyne.Window) AccountsList {
 }
 
 func (al *AccountsList) Build() fyne.CanvasObject {
-	accsTableContent, err := al.accountsService.All()
+	var err error
+	al.accsTableContent, err = al.accountsService.All()
 	if err != nil {
 		dialog.NewError(err, al.Window).Show()
-		accsTableContent = [][]string{}
+		al.accsTableContent = [][]string{}
 	}
 
-	al.buildContentTable(accsTableContent)
-	al.setTableHeader(accsTableContent)
+	al.buildContentTable()
+	al.setTableHeader()
 
 	return al.table
 }
 
-func (al *AccountsList) buildContentTable(accsTableContent [][]string) {
+func (al *AccountsList) buildContentTable() {
 	al.table = widget.NewTable(
 		func() (int, int) {
-			if len(accsTableContent) > 0 {
-				return len(accsTableContent), len(al.contantTableHeaders)
+			if len(al.accsTableContent) > 0 {
+				return len(al.accsTableContent), len(al.contantTableHeaders)
 			} else {
 				return 0, len(al.contantTableHeaders)
 			}
@@ -70,41 +72,37 @@ func (al *AccountsList) buildContentTable(accsTableContent [][]string) {
 				widget.NewButton("", func() {}),
 			)
 		},
-		al.buildTableContentFunc(accsTableContent),
-	)
-}
+		func(i widget.TableCellID, o fyne.CanvasObject) {
+			if len(al.accsTableContent) > 0 {
 
-func (al *AccountsList) buildTableContentFunc(accsTableContent [][]string) func(i widget.TableCellID, o fyne.CanvasObject) {
-	return func(i widget.TableCellID, o fyne.CanvasObject) {
-		if len(accsTableContent) > 0 {
+				// TODO: handle OK
+				c := o.(*fyne.Container)
+				l := c.Objects[0].(*widget.Label)
+				b := c.Objects[1].(*widget.Button)
 
-			// TODO: handle OK
-			c := o.(*fyne.Container)
-			l := c.Objects[0].(*widget.Label)
-			b := c.Objects[1].(*widget.Button)
-
-			if len(accsTableContent[0]) > i.Col {
-				b.Hide()
-				l.Show()
-				l.SetText(accsTableContent[i.Row][i.Col])
-			} else {
-				l.Hide()
-				b.Show()
-				switch i.Col - len(accsTableContent[0]) {
-				case 0:
-					b.SetText("edit")
-				case 1:
-					b.SetText("receipt")
-					b.OnTapped = func() {
-						NewReceiptDialog(accsTableContent[i.Row][0], al.Window).Build().Show()
+				if len(al.accsTableContent[0]) > i.Col {
+					b.Hide()
+					l.Show()
+					l.SetText(al.accsTableContent[i.Row][i.Col])
+				} else {
+					l.Hide()
+					b.Show()
+					switch i.Col - len(al.accsTableContent[0]) {
+					case 0:
+						b.SetText("edit")
+					case 1:
+						b.SetText("receipt")
+						b.OnTapped = func() {
+							NewReceiptDialog(al.accsTableContent[i.Row][0], al.Window).Build().Show()
+						}
 					}
 				}
 			}
-		}
-	}
+		},
+	)
 }
 
-func (al *AccountsList) setTableHeader(accsTableContent [][]string) {
+func (al *AccountsList) setTableHeader() {
 	al.table.CreateHeader = func() fyne.CanvasObject {
 		return container.New(layout.NewStackLayout(), widget.NewLabel(""), widget.NewEntry())
 	}
@@ -125,7 +123,7 @@ func (al *AccountsList) setTableHeader(accsTableContent [][]string) {
 				if err != nil {
 					dialog.NewError(err, al.Window).Show()
 				} else {
-					accsTableContent = r
+					al.accsTableContent = r
 					al.table.Refresh()
 				}
 			}

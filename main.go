@@ -38,7 +38,7 @@ func main() {
 	}
 
 	if err != nil {
-		sugar.Errorf("intet account schema error: %v", err)
+		sugar.Errorf("account schema error: %v", err)
 		os.Exit(1)
 	}
 
