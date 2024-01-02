@@ -6,6 +6,7 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+	"github.com/deut/garage-accounting/config/translate"
 	"github.com/deut/garage-accounting/internal/services"
 )
 
@@ -18,10 +19,9 @@ type AccountsList struct {
 }
 
 type tableHeader struct {
-	placeholder  string
-	text         string
-	isSearchable bool
-	searchKey    string
+	placeholder string
+	text        string
+	searchKey   string
 }
 
 func NewAccountsList(w fyne.Window) AccountsList {
@@ -29,16 +29,38 @@ func NewAccountsList(w fyne.Window) AccountsList {
 		Window:          w,
 		accountsService: services.New(),
 		contantTableHeaders: []tableHeader{
-			{placeholder: "", text: "ID", isSearchable: false, searchKey: "ID"},
-			{placeholder: "GarageNumber", text: "", isSearchable: true, searchKey: "GarageNumber"},
-			{placeholder: "FullName", text: "", isSearchable: true, searchKey: "FullName"},
-			{placeholder: "PhoneNumber", text: "", isSearchable: true, searchKey: "PhoneNumber"},
-			{placeholder: "", text: "Address", isSearchable: false},
-			{placeholder: "", text: "Debt", isSearchable: false},
-			{placeholder: "", text: "ElectricityNumber", isSearchable: false},
-			{placeholder: "", text: "lastPayedYear", isSearchable: false},
-			{placeholder: "          ", text: "", isSearchable: false},
-			{placeholder: "          ", text: "", isSearchable: false},
+			{
+
+				placeholder: translate.T["garageNumber"],
+				text:        "",
+				searchKey:   services.GarageNumber,
+			},
+			{
+				placeholder: translate.T["fullName"],
+				text:        "",
+				searchKey:   services.FullName,
+			},
+			{
+				placeholder: translate.T["phoneNumber"],
+				text:        "",
+				searchKey:   services.PhoneNumber,
+			},
+			{
+				placeholder: "",
+				text:        translate.T["address"],
+			},
+			{
+				placeholder: "",
+				text:        translate.T["lastPayedYear"],
+			},
+			{
+				placeholder: "          ",
+				text:        "",
+			},
+			{
+				placeholder: "          ",
+				text:        "",
+			},
 		},
 	}
 }
@@ -112,7 +134,7 @@ func (al *AccountsList) setTableHeader() {
 		l := c.Objects[0].(*widget.Label)
 		e := c.Objects[1].(*widget.Entry)
 
-		if al.contantTableHeaders[id.Col].isSearchable {
+		if al.contantTableHeaders[id.Col].searchKey != "" {
 			l.Hide()
 			e.Show()
 			e.SetPlaceHolder("🔍  " + al.contantTableHeaders[id.Col].placeholder)
@@ -138,7 +160,7 @@ func (al *AccountsList) setTableHeader() {
 
 	for i, h := range al.contantTableHeaders {
 		var width float32
-		if h.isSearchable {
+		if h.searchKey != "" {
 			width = float32(16 * len(h.placeholder))
 		} else {
 			width = float32(16 * len(h.text))

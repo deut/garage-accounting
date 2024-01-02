@@ -2,10 +2,15 @@ package services
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/deut/garage-accounting/internal/models"
 	"github.com/go-playground/validator"
+)
+
+const (
+	GarageNumber = "garageNumber"
+	FullName     = "fullName"
+	PhoneNumber  = "phoneNumber"
 )
 
 type Account struct {
@@ -39,13 +44,11 @@ func (a *Account) Search(field, value string) ([][]string, error) {
 	}
 
 	switch field {
-	case "ID":
-		searchFunc = models.ByID(value)
-	case "GarageNumber":
+	case GarageNumber:
 		searchFunc = models.ByGarageNumber(value)
-	case "FullName":
+	case FullName:
 		searchFunc = models.ByFullName(value)
-	case "PhoneNumber":
+	case PhoneNumber:
 		searchFunc = models.ByPhoneNumber(value)
 	default:
 		return nil, fmt.Errorf("unknown search field: %s", field)
@@ -62,12 +65,10 @@ func (a *Account) Search(field, value string) ([][]string, error) {
 
 func (a *Account) Create(garageNum, FullName, phone, address string, debt float32, electricityNumber int) error {
 	a.model = models.Account{
-		GarageNumber:      garageNum,
-		FullName:          FullName,
-		PhoneNumber:       phone,
-		Address:           address,
-		Debt:              debt,
-		ElectricityNumber: electricityNumber,
+		GarageNumber: garageNum,
+		FullName:     FullName,
+		PhoneNumber:  phone,
+		Address:      address,
 	}
 
 	validate := validator.New()
@@ -89,13 +90,10 @@ func toTable(accs []models.Account) [][]string {
 	table := [][]string{}
 	for _, a := range accs {
 		t := []string{
-			strconv.FormatUint(uint64(a.ID), 10),
 			a.GarageNumber,
 			a.FullName,
 			a.PhoneNumber,
 			a.Address,
-			fmt.Sprintf("%.2f", a.Debt),
-			fmt.Sprintf("%d", a.ID),
 			a.LastPayedYear(),
 		}
 
