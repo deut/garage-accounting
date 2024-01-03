@@ -28,6 +28,11 @@ var t = Translate{
 		"cancel":          "Відміна",
 		"amount":          "Сума",
 		"selectYearPromt": "Оберіть тариф",
+
+		"garageNumberBlankError": "Номер гаражу повинен бути заповнений",
+		"fullNameBlankError":     "Імʼя та прізвище повинне бути заповнене",
+		"phoneNumberBlankError":  "Номер нелефону повинен бути заповнений",
+		"addressBlankError":      "Адреса повинна бути заповнений",
 	},
 	EN: map[string]string{},
 }

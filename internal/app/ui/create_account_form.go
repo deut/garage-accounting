@@ -10,6 +10,7 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 
+	"github.com/deut/garage-accounting/config/translate"
 	"github.com/deut/garage-accounting/internal/models"
 )
 
@@ -30,37 +31,37 @@ func (caf *CreateAccountForm) Build() fyne.CanvasObject {
 	addressBind := binding.NewString()
 
 	garageNumText := widget.NewEntryWithData(garageNumBind)
-	garageNumText.PlaceHolder = "garageNumText"
+	garageNumText.PlaceHolder = translate.T["garageNumber"]
 	garageNumText.Validator = func(s string) error {
 		if s == "" {
-			return errors.New("should not be blank")
+			return errors.New(translate.T["garageNumberBlankError"])
 		}
 
 		return nil
 	}
 	fullNameText := widget.NewEntryWithData(fullNameBind)
-	fullNameText.PlaceHolder = "fullNameText"
+	fullNameText.PlaceHolder = translate.T["phoneNumber"]
 	fullNameText.Validator = func(s string) error {
 		if s == "" {
-			return errors.New("should not be blank")
+			return errors.New(translate.T["phoneNumberBlankError"])
 		}
 
 		return nil
 	}
 	phoneText := widget.NewEntryWithData(phoneBind)
-	phoneText.PlaceHolder = "phoneText"
+	phoneText.PlaceHolder = translate.T["fullName"]
 	phoneText.Validator = func(s string) error {
 		if s == "" {
-			return errors.New("should not be blank")
+			return errors.New(translate.T["fullNameBlankError"])
 		}
 
 		return nil
 	}
 	addressText := widget.NewEntryWithData(addressBind)
-	addressText.PlaceHolder = "addressText"
+	addressText.PlaceHolder = translate.T["address"]
 	addressText.Validator = func(s string) error {
 		if s == "" {
-			return errors.New("should not be blank")
+			return errors.New(translate.T["addressBlankError"])
 		}
 
 		return nil
