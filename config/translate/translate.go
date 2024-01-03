@@ -16,11 +16,18 @@ var T map[string]string
 
 var t = Translate{
 	UA: map[string]string{
-		"garageNumber":  "№ гаражу",
-		"fullName":      "Імʼя та прізвище",
-		"phoneNumber":   "Телефон",
-		"address":       "Адреса",
-		"lastPayedYear": "Останній сплачений рік",
+		"garageNumber":    "№ гаражу",
+		"fullName":        "Імʼя та прізвище",
+		"phoneNumber":     "Телефон",
+		"address":         "Адреса",
+		"lastPayedYear":   "Останній сплачений рік",
+		"edit":            "Редагувати",
+		"paymentButton":   "Оплата",
+		"paymentFormName": "Оплата",
+		"create":          "Створити",
+		"cancel":          "Відміна",
+		"amount":          "Сума",
+		"selectYearPromt": "Оберіть тариф",
 	},
 	EN: map[string]string{},
 }

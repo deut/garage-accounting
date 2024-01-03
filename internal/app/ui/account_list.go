@@ -111,9 +111,9 @@ func (al *AccountsList) buildContentTable() {
 					b.Show()
 					switch i.Col - len(al.accsTableContent[0]) {
 					case 0:
-						b.SetText("edit")
+						b.SetText(translate.T["edit"])
 					case 1:
-						b.SetText("receipt")
+						b.SetText(translate.T["paymentButton"])
 						b.OnTapped = func() {
 							NewReceiptDialog(al.accsTableContent[i.Row][0], al.Window).Build().Show()
 						}
@@ -161,13 +161,13 @@ func (al *AccountsList) setTableHeader() {
 	for i, h := range al.contantTableHeaders {
 		var width float32
 		if h.searchKey != "" {
-			width = float32(16 * len(h.placeholder))
+			width = float32(7 * len(h.placeholder))
 		} else {
-			width = float32(16 * len(h.text))
+			width = float32(7 * len(h.text))
 		}
 
 		if width == 0 {
-			width = float32(70)
+			width = float32(88)
 		}
 
 		al.table.SetColumnWidth(i, width)

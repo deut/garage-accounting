@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/deut/garage-accounting/config"
+	"github.com/deut/garage-accounting/config/translate"
 	"github.com/deut/garage-accounting/db"
 	"github.com/deut/garage-accounting/internal/app/ui"
 	"github.com/deut/garage-accounting/internal/models"
@@ -18,6 +19,7 @@ const (
 )
 
 func main() {
+	translate.SetLang(translate.UA)
 	logger, _ := zap.NewProduction()
 	defer logger.Sync() // flushes buffer, if any
 	sugar := logger.Sugar()

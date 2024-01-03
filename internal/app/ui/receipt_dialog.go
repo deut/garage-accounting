@@ -8,6 +8,7 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 
+	"github.com/deut/garage-accounting/config/translate"
 	"github.com/deut/garage-accounting/internal/services"
 )
 
@@ -35,10 +36,10 @@ func (rd *ReceiptDialog) Build() dialog.Dialog {
 
 	valueBind := binding.NewString()
 	valueW := widget.NewEntryWithData(valueBind)
-	valueW.SetPlaceHolder("amount")
+	valueW.SetPlaceHolder(translate.T["amount"])
 
 	years := []string{}
-	for y, _ := range ratesByYears {
+	for y := range ratesByYears {
 		years = append(years, y)
 	}
 
@@ -48,15 +49,17 @@ func (rd *ReceiptDialog) Build() dialog.Dialog {
 		valueW.SetText(fmt.Sprintf("%.2f", ratesByYears[s]))
 	})
 
+	yearW.PlaceHolder = translate.T["selectYearPromt"]
+
 	formItems := []*widget.FormItem{
 		widget.NewFormItem("", yearW),
 		widget.NewFormItem("", valueW),
 	}
 
 	return dialog.NewForm(
-		"Receipt",
-		"create",
-		"cancel",
+		translate.T["paymentFormName"],
+		translate.T["create"],
+		translate.T["cancel"],
 		formItems,
 		rd.receiptHandlerFunc(rd.accountID, yearStr, valueBind),
 		rd.window,
