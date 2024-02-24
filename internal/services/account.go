@@ -94,7 +94,6 @@ func toTable(accs []models.Account) [][]string {
 			a.FullName,
 			a.PhoneNumber,
 			a.Address,
-			a.LastPayedYear(),
 		}
 
 		table = append(table, t)

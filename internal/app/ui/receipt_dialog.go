@@ -13,18 +13,20 @@ import (
 )
 
 type ReceiptDialog struct {
-	accountID      string
+	garageNumber   string
 	rateService    *services.Rate
 	paymentService *services.Payment
 	window         fyne.Window
+	refresh        func()
 }
 
-func NewReceiptDialog(accountID string, window fyne.Window) *ReceiptDialog {
+func NewReceiptDialog(garageNumber string, window fyne.Window, refresh func()) *ReceiptDialog {
 	return &ReceiptDialog{
-		accountID:      accountID,
+		garageNumber:   garageNumber,
 		rateService:    services.NewRate(),
 		paymentService: services.NewPayment(),
 		window:         window,
+		refresh:        refresh,
 	}
 }
 
@@ -61,12 +63,12 @@ func (rd *ReceiptDialog) Build() dialog.Dialog {
 		translate.T["create"],
 		translate.T["cancel"],
 		formItems,
-		rd.receiptHandlerFunc(rd.accountID, yearStr, valueBind),
+		rd.receiptHandlerFunc(rd.garageNumber, yearStr, valueBind),
 		rd.window,
 	)
 }
 
-func (rd *ReceiptDialog) receiptHandlerFunc(accountID string, year string, value binding.String) func(bool) {
+func (rd *ReceiptDialog) receiptHandlerFunc(garageNumber string, year string, value binding.String) func(bool) {
 	return func(isCreate bool) {
 		if isCreate {
 			paymentValue, err := value.Get()
@@ -74,10 +76,12 @@ func (rd *ReceiptDialog) receiptHandlerFunc(accountID string, year string, value
 				dialog.NewError(err, rd.window).Show()
 			}
 
-			_, err = rd.paymentService.Pay(accountID, year, paymentValue)
+			_, err = rd.paymentService.Pay(garageNumber, year, paymentValue)
 			if err != nil {
 				dialog.NewError(err, rd.window).Show()
 			}
 		}
+
+		rd.refresh()
 	}
 }

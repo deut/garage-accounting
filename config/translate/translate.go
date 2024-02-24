@@ -16,11 +16,11 @@ var T map[string]string
 
 var t = Translate{
 	UA: map[string]string{
-		"garageNumber":    "№ гаражу",
-		"fullName":        "Імʼя та прізвище",
-		"phoneNumber":     "Телефон",
-		"address":         "Адреса",
-		"lastPayedYear":   "Останній сплачений рік",
+		"garageNumber": "№ гаражу",
+		"fullName":     "Імʼя та прізвище",
+		"phoneNumber":  "Телефон",
+		"address":      "Адреса",
+		// "lastPayedYear":   "Останній сплачений рік",
 		"edit":            "Редагувати",
 		"paymentButton":   "Оплата",
 		"paymentFormName": "Оплата",
@@ -28,6 +28,9 @@ var t = Translate{
 		"cancel":          "Відміна",
 		"amount":          "Сума",
 		"selectYearPromt": "Оберіть тариф",
+		"showPayments":    "Оплати",
+		"addAccount":      "Додати",
+		"done":            "Застосувати",
 
 		"garageNumberBlankError": "Номер гаражу повинен бути заповнений",
 		"fullNameBlankError":     "Імʼя та прізвище повинне бути заповнене",

@@ -10,9 +10,9 @@ import (
 type Payment struct {
 	gorm.Model
 	AccountID int
-	Account   Account `gorm:"foreignKey:AccountID"`
+	Account   Account `gorm:"foreignKey:AccountID;not null"`
 	RateID    int
-	Rate      Rate `gorm:"foreignKey:RateID"`
+	Rate      Rate `gorm:"foreignKey:RateID;not null"`
 	Value     float32
 }
 
@@ -21,9 +21,11 @@ func (p *Payment) Create(a *Account, r *Rate, value float32) (*Payment, error) {
 	p.RateID = int(r.ID)
 	p.Value = value
 
-	err := db.DB.Create(p).Error
+	if err := db.DB.Create(p).Error; err != nil {
+		return nil, fmt.Errorf("cannot create payment: %w", err)
+	}
 
-	return p, fmt.Errorf("cannot create payment: %w", err)
+	return p, nil
 }
 
 func (p *Payment) All(accountID int) ([]Payment, error) {

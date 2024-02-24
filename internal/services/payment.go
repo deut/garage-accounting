@@ -15,16 +15,11 @@ func NewPayment() *Payment {
 	return &Payment{payment: &models.Payment{}}
 }
 
-func (p *Payment) Pay(accountID, year, paymentValue string) (*models.Payment, error) {
-	id, err := strconv.Atoi(accountID)
-	if err != nil {
-		return nil, fmt.Errorf("wrong accountID (%s) has wrong value: %w", accountID, err)
-	}
-
+func (p *Payment) Pay(garageNumber, year, paymentValue string) (*models.Payment, error) {
 	acc := &models.Account{}
-	acc, err = acc.FindByID(id)
+	acc, err := acc.FindByGarageNumber(garageNumber)
 	if err != nil {
-		return nil, fmt.Errorf("account with ID = %d is not found: %w", id, err)
+		return nil, fmt.Errorf("account with GarageNumber = %s is not found: %w", garageNumber, err)
 	}
 
 	rate := &models.Rate{}
@@ -39,7 +34,10 @@ func (p *Payment) Pay(accountID, year, paymentValue string) (*models.Payment, er
 	}
 
 	payment := &models.Payment{Account: *acc, Rate: *rate, Value: float32(value)}
-	payment.Create(acc, rate, float32(value))
+	_, err = payment.Create(acc, rate, float32(value))
+	if err != nil {
+		return nil, fmt.Errorf("payment failed: %w", err)
+	}
 
 	return payment, nil
 }

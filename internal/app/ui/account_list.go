@@ -16,6 +16,8 @@ type AccountsList struct {
 	contantTableHeaders []tableHeader
 	table               *widget.Table
 	accsTableContent    [][]string
+	tableColumnCount    int
+	editRow             int
 }
 
 type tableHeader struct {
@@ -23,6 +25,11 @@ type tableHeader struct {
 	text        string
 	searchKey   string
 }
+
+const (
+	editRowNumber           = 4
+	editAccountButtonColumn = iota
+)
 
 func NewAccountsList(w fyne.Window) AccountsList {
 	return AccountsList{
@@ -50,8 +57,8 @@ func NewAccountsList(w fyne.Window) AccountsList {
 				text:        translate.T["address"],
 			},
 			{
-				placeholder: "",
-				text:        translate.T["lastPayedYear"],
+				placeholder: "          ",
+				text:        "",
 			},
 			{
 				placeholder: "          ",
@@ -66,12 +73,17 @@ func NewAccountsList(w fyne.Window) AccountsList {
 }
 
 func (al *AccountsList) Build() fyne.CanvasObject {
-	var err error
-	al.accsTableContent, err = al.accountsService.All()
+	accs, err := al.accountsService.All()
 	if err != nil {
 		dialog.NewError(err, al.Window).Show()
 		al.accsTableContent = [][]string{}
 	}
+
+	al.tableColumnCount = len(accs[0])
+
+	// Add first empty element to have first row "sticky"
+	al.accsTableContent = [][]string{{}}
+	al.accsTableContent = append(al.accsTableContent, accs...)
 
 	al.buildContentTable()
 	al.setTableHeader()
@@ -80,6 +92,7 @@ func (al *AccountsList) Build() fyne.CanvasObject {
 }
 
 func (al *AccountsList) buildContentTable() {
+	al.editRow = -1
 	al.table = widget.NewTable(
 		func() (int, int) {
 			if len(al.accsTableContent) > 0 {
@@ -92,36 +105,101 @@ func (al *AccountsList) buildContentTable() {
 			return container.NewStack(
 				widget.NewLabel(""),
 				widget.NewButton("", func() {}),
+				widget.NewEntry(),
 			)
 		},
 		func(i widget.TableCellID, o fyne.CanvasObject) {
-			if len(al.accsTableContent) > 0 {
+			// TODO: handle OK
+			c := o.(*fyne.Container)
+			l := c.Objects[0].(*widget.Label)
+			b := c.Objects[1].(*widget.Button)
+			e := c.Objects[2].(*widget.Entry)
 
-				// TODO: handle OK
-				c := o.(*fyne.Container)
-				l := c.Objects[0].(*widget.Label)
-				b := c.Objects[1].(*widget.Button)
+			if i.Row == 0 {
+				e.Hide()
+				l.Hide()
+				b.Hide()
 
-				if len(al.accsTableContent[0]) > i.Col {
-					b.Hide()
-					l.Show()
-					l.SetText(al.accsTableContent[i.Row][i.Col])
-				} else {
-					l.Hide()
-					b.Show()
-					switch i.Col - len(al.accsTableContent[0]) {
-					case 0:
-						b.SetText(translate.T["edit"])
-					case 1:
-						b.SetText(translate.T["paymentButton"])
-						b.OnTapped = func() {
-							NewReceiptDialog(al.accsTableContent[i.Row][0], al.Window).Build().Show()
+				return
+			}
+
+			if len(al.accsTableContent) == 0 {
+				return
+			}
+
+			if al.tableColumnCount > i.Col && i.Row != al.editRow {
+				b.Hide()
+				e.Hide()
+				l.Show()
+				controlText := ""
+
+				// The row can be empty
+				if len(al.accsTableContent[i.Row]) == al.tableColumnCount {
+					controlText = al.accsTableContent[i.Row][i.Col]
+				}
+
+				l.SetText(controlText)
+				e.SetText(controlText)
+
+			} else if i.Row < al.tableColumnCount && i.Row != al.editRow {
+				e.Hide()
+				l.Hide()
+				b.Show()
+				switch i.Col - al.tableColumnCount {
+				case 0:
+					b.SetText(translate.T["edit"])
+					editStarted := false
+					b.OnTapped = func() {
+						if !editStarted {
+							al.editRow = i.Row
+							b.SetText(translate.T["done"])
+							editStarted = true
+							al.Refresh()
+						} else {
+							al.editRow = -1
+							b.SetText(translate.T["edit"])
+							editStarted = false
+							al.Refresh()
 						}
 					}
+				case 1:
+					b.SetText(translate.T["paymentButton"])
+					b.OnTapped = func() {
+						d := NewReceiptDialog(al.accsTableContent[i.Row][0], al.Window, al.Refresh)
+						d.Build().Show()
+					}
+				case 2:
+					b.SetText(translate.T["showPayments"])
+					b.OnTapped = func() {
+
+					}
 				}
+			} else if al.editRow == i.Row {
+				if i.Row == al.editRow {
+					b.Show()
+					if i.Col < editRowNumber {
+						e.Show()
+						l.Hide()
+						b.Hide()
+					} else if i.Col > editRowNumber {
+						e.Hide()
+						l.Hide()
+						b.Hide()
+					}
+				}
+			} else {
+				e.Hide()
+				l.Hide()
+				b.Hide()
 			}
 		},
 	)
+
+	al.table.StickyRowCount = 1
+}
+
+func (al *AccountsList) Refresh() {
+	al.table.Refresh()
 }
 
 func (al *AccountsList) setTableHeader() {
@@ -161,13 +239,13 @@ func (al *AccountsList) setTableHeader() {
 	for i, h := range al.contantTableHeaders {
 		var width float32
 		if h.searchKey != "" {
-			width = float32(7 * len(h.placeholder))
+			width = float32(8 * len(h.placeholder))
 		} else {
-			width = float32(7 * len(h.text))
+			width = float32(8 * len(h.text))
 		}
 
 		if width == 0 {
-			width = float32(88)
+			width = float32(92)
 		}
 
 		al.table.SetColumnWidth(i, width)

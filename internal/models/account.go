@@ -68,6 +68,15 @@ func (a *Account) FindByID(id int) (*Account, error) {
 	return a, nil
 }
 
+func (a *Account) FindByGarageNumber(n string) (*Account, error) {
+	err := db.DB.Find(a, "garage_number = ?", n).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return a, nil
+}
+
 func (a *Account) Insert() error {
 	err := db.DB.Create(a).Error
 	if err != nil {
