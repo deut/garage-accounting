@@ -28,9 +28,7 @@ func New() *Account {
 
 func (a *Account) All() ([][]string, error) {
 	var err error
-	if len(a.collection) == 0 {
-		a.collection, err = a.model.GetAll()
-	}
+	a.collection, err = a.model.GetAll()
 
 	return toTable(a.collection), err
 }
@@ -65,7 +63,7 @@ func (a *Account) Search(field, value string) ([][]string, error) {
 }
 
 func (a *Account) CreateFromBindings(bindings ...binding.String) error {
-	if len(bindings) != 4 {
+	if len(bindings) < 4 {
 		return fmt.Errorf("wrong argument set")
 	}
 
