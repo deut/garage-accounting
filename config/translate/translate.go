@@ -20,6 +20,11 @@ var t = Translate{
 		"fullName":     "Імʼя та прізвище",
 		"phoneNumber":  "Телефон",
 		"address":      "Адреса",
+
+		"enterGarageNumber": "введіть № гаражу",
+		"enterFullName":     "введіть Імʼя та прізвище",
+		"enterPhoneNumber":  "введіть Телефон",
+		"enterAddress":      "введіть Адреса",
 		// "lastPayedYear":   "Останній сплачений рік",
 		"edit":            "Редагувати",
 		"paymentButton":   "Оплата",

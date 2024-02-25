@@ -3,6 +3,7 @@ package ui
 import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
@@ -29,6 +30,10 @@ type tableHeader struct {
 const (
 	editRowNumber           = 4
 	editAccountButtonColumn = iota
+)
+
+var (
+	stringBindings [][]binding.String
 )
 
 func NewAccountsList(w fyne.Window) AccountsList {
@@ -73,6 +78,14 @@ func NewAccountsList(w fyne.Window) AccountsList {
 }
 
 func (al *AccountsList) Build() fyne.CanvasObject {
+	al.buildData()
+	al.buildContentTable()
+	al.setTableHeader()
+
+	return al.table
+}
+
+func (al *AccountsList) buildData() {
 	accs, err := al.accountsService.All()
 	if err != nil {
 		dialog.NewError(err, al.Window).Show()
@@ -84,15 +97,12 @@ func (al *AccountsList) Build() fyne.CanvasObject {
 	// Add first empty element to have first row "sticky"
 	al.accsTableContent = [][]string{{}}
 	al.accsTableContent = append(al.accsTableContent, accs...)
-
-	al.buildContentTable()
-	al.setTableHeader()
-
-	return al.table
 }
 
 func (al *AccountsList) buildContentTable() {
 	al.editRow = -1
+	stringBindings = make([][]binding.String, len(al.accsTableContent))
+
 	al.table = widget.NewTable(
 		func() (int, int) {
 			if len(al.accsTableContent) > 0 {
@@ -109,16 +119,40 @@ func (al *AccountsList) buildContentTable() {
 			)
 		},
 		func(i widget.TableCellID, o fyne.CanvasObject) {
-			// TODO: handle OK
+			if len(stringBindings[i.Row]) == 0 {
+				stringBindings[i.Row] = make([]binding.String, editRowNumber)
+			}
+
 			c := o.(*fyne.Container)
 			l := c.Objects[0].(*widget.Label)
 			b := c.Objects[1].(*widget.Button)
 			e := c.Objects[2].(*widget.Entry)
+			if i.Col < editRowNumber {
+				bs := binding.NewString()
+				e.Bind(bs)
+				stringBindings[i.Row][i.Col] = bs
+			}
 
 			if i.Row == 0 {
 				e.Hide()
 				l.Hide()
 				b.Hide()
+				if i.Col < al.tableColumnCount {
+					e.Show()
+				} else if i.Col == al.tableColumnCount {
+					b.Text = "create"
+					b.OnTapped = func() {
+						err := al.accountsService.CreateFromBindings(stringBindings[i.Row]...)
+
+						if err != nil {
+							// TODO: Translate error
+							dialog.NewError(err, al.Window).Show()
+						} else {
+							al.Refresh(true)
+						}
+					}
+					b.Show()
+				}
 
 				return
 			}
@@ -198,7 +232,11 @@ func (al *AccountsList) buildContentTable() {
 	al.table.StickyRowCount = 1
 }
 
-func (al *AccountsList) Refresh() {
+func (al *AccountsList) Refresh(isFull ...bool) {
+	if len(isFull) > 0 && isFull[0] {
+		al.buildData()
+	}
+
 	al.table.Refresh()
 }
 

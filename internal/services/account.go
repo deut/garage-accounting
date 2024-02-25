@@ -3,6 +3,7 @@ package services
 import (
 	"fmt"
 
+	"fyne.io/fyne/v2/data/binding"
 	"github.com/deut/garage-accounting/internal/models"
 	"github.com/go-playground/validator"
 )
@@ -63,7 +64,35 @@ func (a *Account) Search(field, value string) ([][]string, error) {
 	return toTable(a.collection), nil
 }
 
-func (a *Account) Create(garageNum, FullName, phone, address string, debt float32, electricityNumber int) error {
+func (a *Account) CreateFromBindings(bindings ...binding.String) error {
+	if len(bindings) != 4 {
+		return fmt.Errorf("wrong argument set")
+	}
+
+	garageNum, err := bindings[0].Get()
+	if err != nil {
+		return fmt.Errorf("cannot read garage number from binding 0")
+	}
+
+	FullName, err := bindings[1].Get()
+	if err != nil {
+		return fmt.Errorf("cannot read full name from binding 1")
+	}
+
+	phone, err := bindings[2].Get()
+	if err != nil {
+		return fmt.Errorf("cannot read phone from  binding 2")
+	}
+
+	address, err := bindings[3].Get()
+	if err != nil {
+		return fmt.Errorf("cannot read address from binding 3")
+	}
+
+	return a.Create(garageNum, FullName, phone, address)
+}
+
+func (a *Account) Create(garageNum, FullName, phone, address string) error {
 	a.model = models.Account{
 		GarageNumber: garageNum,
 		FullName:     FullName,

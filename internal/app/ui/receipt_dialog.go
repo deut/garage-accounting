@@ -17,10 +17,10 @@ type ReceiptDialog struct {
 	rateService    *services.Rate
 	paymentService *services.Payment
 	window         fyne.Window
-	refresh        func()
+	refresh        func(...bool)
 }
 
-func NewReceiptDialog(garageNumber string, window fyne.Window, refresh func()) *ReceiptDialog {
+func NewReceiptDialog(garageNumber string, window fyne.Window, refresh func(...bool)) *ReceiptDialog {
 	return &ReceiptDialog{
 		garageNumber:   garageNumber,
 		rateService:    services.NewRate(),
