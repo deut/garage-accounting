@@ -39,7 +39,7 @@ func ByPhoneNumber(v string) SearchQueryFunc {
 
 func (a *Account) Search(sq SearchQueryFunc) ([]Account, error) {
 	accs := []Account{}
-	q := db.DB.Model(&Account{}).Preload("Payments.Rate").Where(sq())
+	q := db.DB.Model(&Account{}).Where(sq())
 
 	if err := q.Find(&accs).Error; err != nil {
 		return nil, fmt.Errorf("cannot find accounts: %w", err)
@@ -50,7 +50,7 @@ func (a *Account) Search(sq SearchQueryFunc) ([]Account, error) {
 
 func (a *Account) GetAll() ([]Account, error) {
 	accs := []Account{}
-	q := db.DB.Model(&Account{}).Preload("Payments.Rate").Find(&accs)
+	q := db.DB.Model(&Account{}).Order("created_at DESC").Find(&accs)
 
 	if err := q.Error; err != nil {
 		return nil, fmt.Errorf("cannot load accounts: %w", err)

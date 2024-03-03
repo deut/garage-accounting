@@ -19,7 +19,6 @@ type AccountsList struct {
 	tableHeaders     []tableHeader
 	table            *widget.Table
 	accsTableContent [][]string
-	refresh          chan struct{}
 	// editRow          int
 }
 
@@ -103,7 +102,6 @@ func (al *AccountsList) buildData() {
 	// Add first empty element to have first row "sticky"
 	al.accsTableContent = [][]string{{}}
 	al.accsTableContent = append(al.accsTableContent, accs...)
-	al.autorefresher()
 }
 
 func (al *AccountsList) buildContentTable() {
@@ -214,18 +212,7 @@ func (al *AccountsList) refreshTableAndContent() {
 	al.refreshTable()
 }
 func (al *AccountsList) refreshTable() {
-	go func() {
-		al.refresh <- struct{}{}
-	}()
-}
-
-func (al *AccountsList) autorefresher() {
-	go func() {
-		for {
-			<-al.refresh
-			al.table.Refresh()
-		}
-	}()
+	al.table.Refresh()
 }
 
 func (al *AccountsList) setTableHeader() {
