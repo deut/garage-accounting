@@ -1,13 +1,9 @@
 package ui
 
 import (
-	"log"
-
 	"fyne.io/fyne/v2"
-	fyneApp "fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
 )
 
 type App struct {
@@ -19,7 +15,7 @@ type App struct {
 }
 
 func NewUI(appName string, h, w float32) *App {
-	a := fyneApp.New()
+	a := app.New()
 	return &App{
 		App:        a,
 		MainWindow: a.NewWindow(appName),
@@ -38,24 +34,13 @@ func (a *App) ShowMainWindow() {
 }
 
 func (a *App) Build() {
-	toolbar := widget.NewToolbar(
-		widget.NewToolbarAction(theme.DocumentCreateIcon(), func() {
-			log.Println("New document")
-		}),
-		widget.NewToolbarSeparator(),
-		widget.NewToolbarAction(theme.ContentCutIcon(), func() {}),
-		widget.NewToolbarAction(theme.ContentCopyIcon(), func() {}),
-		widget.NewToolbarAction(theme.ContentPasteIcon(), func() {}),
-		widget.NewToolbarSpacer(),
-		widget.NewToolbarAction(theme.HelpIcon(), func() {
-			log.Println("Display help")
-		}),
-	)
+	t := NewToolbar()
+	al := NewAccountsList(a.MainWindow)
 
-	listAccs := NewAccountsList(a.MainWindow)
-	accListObj := listAccs.Build()
+	toolbar := t.Build()
+	accountsList := al.Build()
 
-	content := container.NewBorder(toolbar, nil, nil, nil, accListObj)
+	content := container.NewBorder(toolbar, nil, nil, nil, accountsList)
 
 	a.SetContent(content)
 	a.ShowMainWindow()
