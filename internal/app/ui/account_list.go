@@ -205,13 +205,16 @@ func (al *AccountsList) setTableHeader() {
 			isOrderDESC = !isOrderDESC
 
 			if columnConfig.orderKey == currentOrderColumn {
+				al.orderColumn = columnConfig.orderKey
 				if isOrderDESC {
 					b.SetIcon(theme.MenuDropDownIcon())
-					al.buildData(al.orderColumn, "DESC")
+					al.orderDirection = "DESC"
+					al.buildData(al.orderColumn, al.orderDirection)
 					al.table.Refresh()
 				} else {
 					b.SetIcon(theme.MenuDropUpIcon())
-					al.buildData(al.orderColumn, "ASC")
+					al.orderDirection = "ASC"
+					al.buildData(al.orderColumn, al.orderDirection)
 					al.table.Refresh()
 				}
 			}
