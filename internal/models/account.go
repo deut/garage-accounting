@@ -19,27 +19,14 @@ type Account struct {
 	Payments          []Payment `gorm:"foreignKey:AccountID"`
 }
 
-type SearchQueryFunc func() (string, string)
-
-func ByID(v string) SearchQueryFunc {
-	return func() (string, string) { return "ID = ?", v }
-}
-
-func ByGarageNumber(v string) SearchQueryFunc {
-	return func() (string, string) { return "garage_number LIKE ?", "%" + v + "%" }
-}
-
-func ByFullName(v string) SearchQueryFunc {
-	return func() (string, string) { return "full_name LIKE ?", "%" + v + "%" }
-}
-
-func ByPhoneNumber(v string) SearchQueryFunc {
-	return func() (string, string) { return "phone_number LIKE ?", "%" + v + "%" }
-}
-
-func (a *Account) Search(sq SearchQueryFunc) ([]Account, error) {
+func (a *Account) Search(search string) ([]Account, error) {
 	accs := []Account{}
-	q := db.DB.Model(&Account{}).Where(sq())
+	q := db.DB.Model(&Account{}).Where(
+		"garage_number LIKE %?% OR full_name LIKE %?%  OR phone_number LIKE %?%",
+		search,
+		search,
+		search,
+	)
 
 	if err := q.Find(&accs).Error; err != nil {
 		return nil, fmt.Errorf("cannot find accounts: %w", err)
@@ -48,9 +35,9 @@ func (a *Account) Search(sq SearchQueryFunc) ([]Account, error) {
 	return accs, nil
 }
 
-func (a *Account) GetAll() ([]Account, error) {
+func (a *Account) GetAll(orderColumn, orderDirection string) ([]Account, error) {
 	accs := []Account{}
-	q := db.DB.Model(&Account{}).Order("created_at DESC").Find(&accs)
+	q := db.DB.Model(&Account{}).Order(fmt.Sprintf("%s %s", orderColumn, orderDirection)).Find(&accs)
 
 	if err := q.Error; err != nil {
 		return nil, fmt.Errorf("cannot load accounts: %w", err)

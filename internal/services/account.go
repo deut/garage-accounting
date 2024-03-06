@@ -26,34 +26,16 @@ func New() *Account {
 	}
 }
 
-func (a *Account) All() ([][]string, error) {
+func (a *Account) All(orderColumn, orderDirection string) ([][]string, error) {
 	var err error
-	a.collection, err = a.model.GetAll()
+	a.collection, err = a.model.GetAll(orderColumn, orderDirection)
 
 	return toTable(a.collection), err
 }
 
-func (a *Account) Search(field, value string) ([][]string, error) {
-	var searchFunc models.SearchQueryFunc
+func (a *Account) Search(value string) ([][]string, error) {
 	var err error
-
-	if value == "" {
-		a.collection, err = a.model.GetAll()
-		return toTable(a.collection), err
-	}
-
-	switch field {
-	case GarageNumber:
-		searchFunc = models.ByGarageNumber(value)
-	case FullName:
-		searchFunc = models.ByFullName(value)
-	case PhoneNumber:
-		searchFunc = models.ByPhoneNumber(value)
-	default:
-		return nil, fmt.Errorf("unknown search field: %s", field)
-	}
-
-	a.collection, err = a.model.Search(searchFunc)
+	a.collection, err = a.model.Search(value)
 
 	if err != nil {
 		return nil, err
@@ -121,6 +103,7 @@ func toTable(accs []models.Account) [][]string {
 			a.FullName,
 			a.PhoneNumber,
 			a.Address,
+			a.CreatedAt.Format("2006-01-02 15:04:05"),
 		}
 
 		table = append(table, t)

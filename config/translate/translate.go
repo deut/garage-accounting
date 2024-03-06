@@ -36,6 +36,7 @@ var t = Translate{
 		"showPayments":    "Оплати",
 		"addAccount":      "Додати",
 		"done":            "Застосувати",
+		"createdAt":       "Дата створення запису",
 
 		"garageNumberBlankError": "Номер гаражу повинен бути заповнений",
 		"fullNameBlankError":     "Імʼя та прізвище повинне бути заповнене",

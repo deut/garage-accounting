@@ -3,11 +3,11 @@ package ui
 import (
 	"fmt"
 
+	"fyne.io/fyne/theme"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/deut/garage-accounting/config/translate"
 	"github.com/deut/garage-accounting/internal/services"
@@ -20,6 +20,8 @@ type AccountsList struct {
 	table            *widget.Table
 	accsTableContent [][]string
 	// editRow          int
+	orderColumn    string
+	orderDirection string
 }
 
 type tableHeader struct {
@@ -32,8 +34,10 @@ type tableHeader struct {
 }
 
 const (
-	editRowNumber = 4
-	labelControl  = iota
+	defaultOrderColumn    = "created_at"
+	defaultOrderDirection = "DESC"
+	editRowNumber         = 4
+	labelControl          = iota
 	entryControl
 	buttonControl
 )
@@ -47,21 +51,23 @@ func NewAccountsList(w fyne.Window) AccountsList {
 	return AccountsList{
 		Window:          w,
 		accountsService: services.New(),
+		orderColumn:     defaultOrderColumn,
+		orderDirection:  defaultOrderDirection,
 		tableHeaders: []tableHeader{
 			{
-				orderKey:         "garageNumber",
+				orderKey:         "garage_number",
 				text:             translate.T["garageNumber"],
 				primaryControl:   labelControl,
 				secondaryControl: entryControl,
 			},
 			{
-				orderKey:         "fullName",
+				orderKey:         "full_name",
 				text:             translate.T["fullName"],
 				primaryControl:   labelControl,
 				secondaryControl: entryControl,
 			},
 			{
-				orderKey:         "phoneNumber",
+				orderKey:         "phone_number",
 				text:             translate.T["phoneNumber"],
 				primaryControl:   labelControl,
 				secondaryControl: entryControl,
@@ -70,6 +76,13 @@ func NewAccountsList(w fyne.Window) AccountsList {
 				orderKey:         "address",
 				placeholder:      "",
 				text:             translate.T["address"],
+				primaryControl:   labelControl,
+				secondaryControl: entryControl,
+			},
+			{
+				orderKey:         "created_at",
+				placeholder:      "",
+				text:             translate.T["createdAt"],
 				primaryControl:   labelControl,
 				secondaryControl: entryControl,
 			},
@@ -83,14 +96,14 @@ func NewAccountsList(w fyne.Window) AccountsList {
 }
 
 func (al *AccountsList) Build() fyne.CanvasObject {
-	al.buildData()
+	al.buildData(al.orderColumn, al.orderDirection)
 	al.buildContentTable()
 	al.setTableHeader()
 	return al.table
 }
 
-func (al *AccountsList) buildData() {
-	accs, err := al.accountsService.All()
+func (al *AccountsList) buildData(orderColumn, orderDirection string) {
+	accs, err := al.accountsService.All(orderColumn, orderDirection)
 	if err != nil {
 		dialog.NewError(err, al.Window).Show()
 		al.accsTableContent = [][]string{}
@@ -183,20 +196,27 @@ func (al *AccountsList) setTableHeader() {
 		b := o.(*widget.Button)
 		columnConfig := al.tableHeaders[cellID.Col]
 
+		if columnConfig.orderKey != currentOrderColumn {
+			b.SetIcon(nil)
+		}
+
 		b.OnTapped = func() {
 			currentOrderColumn = columnConfig.orderKey
 			isOrderDESC = !isOrderDESC
-			al.table.Refresh()
-		}
 
-		if columnConfig.orderKey == currentOrderColumn {
-			if isOrderDESC {
-				b.SetIcon(theme.MenuDropDownIcon())
-			} else {
-				b.SetIcon(theme.MenuDropUpIcon())
+			if columnConfig.orderKey == currentOrderColumn {
+				if isOrderDESC {
+					b.SetIcon(theme.MenuDropDownIcon())
+					al.buildData(al.orderColumn, "DESC")
+					al.table.Refresh()
+				} else {
+					b.SetIcon(theme.MenuDropUpIcon())
+					al.buildData(al.orderColumn, "ASC")
+					al.table.Refresh()
+				}
 			}
-		} else {
-			b.SetIcon(nil)
+
+			al.table.Refresh()
 		}
 
 		b.SetText(columnConfig.text)
