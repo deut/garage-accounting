@@ -14,6 +14,7 @@ import (
 )
 
 type AccountsList struct {
+	widget.BaseWidget
 	Window           fyne.Window
 	accountsService  *services.Account
 	tableHeaders     []tableHeader
@@ -23,6 +24,8 @@ type AccountsList struct {
 	orderColumn    string
 	orderDirection string
 }
+
+var _ fyne.Widget = (*AccountsList)(nil)
 
 type tableHeader struct {
 	placeholder      string
@@ -47,8 +50,8 @@ var (
 	isOrderDESC        bool
 )
 
-func NewAccountsList(w fyne.Window) AccountsList {
-	return AccountsList{
+func NewAccountsList(w fyne.Window) *AccountsList {
+	al := &AccountsList{
 		Window:          w,
 		accountsService: services.New(),
 		orderColumn:     defaultOrderColumn,
@@ -93,6 +96,14 @@ func NewAccountsList(w fyne.Window) AccountsList {
 			},
 		},
 	}
+
+	al.ExtendBaseWidget(al)
+
+	return al
+}
+
+func (al *AccountsList) CreateRenderer() fyne.WidgetRenderer {
+	return widget.NewSimpleRenderer(al.Build())
 }
 
 func (al *AccountsList) Build() fyne.CanvasObject {

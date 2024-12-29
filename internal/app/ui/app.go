@@ -35,10 +35,7 @@ func (a *App) ShowMainWindow() {
 
 func (a *App) Build() {
 	toolbar := NewToolbarWidget(a.MainWindow)
-	al := NewAccountsList(a.MainWindow)
-
-	accountsList := al.Build()
-
+	accountsList := NewAccountsList(a.MainWindow)
 	content := container.NewBorder(toolbar, nil, nil, nil, accountsList)
 
 	a.SetContent(content)
