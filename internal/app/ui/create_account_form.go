@@ -31,37 +31,37 @@ func (caf *CreateAccountForm) Build() fyne.CanvasObject {
 	addressBind := binding.NewString()
 
 	garageNumText := widget.NewEntryWithData(garageNumBind)
-	garageNumText.PlaceHolder = translate.T["garageNumber"]
+	garageNumText.PlaceHolder = translate.T("garageNumber")
 	garageNumText.Validator = func(s string) error {
 		if s == "" {
-			return errors.New(translate.T["garageNumberBlankError"])
+			return errors.New(translate.T("garageNumberBlankError"))
 		}
 
 		return nil
 	}
 	fullNameText := widget.NewEntryWithData(fullNameBind)
-	fullNameText.PlaceHolder = translate.T["phoneNumber"]
+	fullNameText.PlaceHolder = translate.T("phoneNumber")
 	fullNameText.Validator = func(s string) error {
 		if s == "" {
-			return errors.New(translate.T["phoneNumberBlankError"])
+			return errors.New(translate.T("phoneNumberBlankError"))
 		}
 
 		return nil
 	}
 	phoneText := widget.NewEntryWithData(phoneBind)
-	phoneText.PlaceHolder = translate.T["fullName"]
+	phoneText.PlaceHolder = translate.T("fullName")
 	phoneText.Validator = func(s string) error {
 		if s == "" {
-			return errors.New(translate.T["fullNameBlankError"])
+			return errors.New(translate.T("fullNameBlankError"))
 		}
 
 		return nil
 	}
 	addressText := widget.NewEntryWithData(addressBind)
-	addressText.PlaceHolder = translate.T["address"]
+	addressText.PlaceHolder = translate.T("address")
 	addressText.Validator = func(s string) error {
 		if s == "" {
-			return errors.New(translate.T["addressBlankError"])
+			return errors.New(translate.T("addressBlankError"))
 		}
 
 		return nil

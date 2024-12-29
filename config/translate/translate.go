@@ -12,7 +12,7 @@ type Translate struct {
 	UA map[string]string
 }
 
-var T map[string]string
+var currentLang map[string]string
 
 var t = Translate{
 	UA: map[string]string{
@@ -49,12 +49,20 @@ var t = Translate{
 func SetLang(l string) error {
 	switch l {
 	case UA:
-		T = t.UA
+		currentLang = t.UA
 	case EN:
-		T = t.EN
+		currentLang = t.EN
 	default:
 		return fmt.Errorf("unknown language %s", l)
 	}
 
 	return nil
+}
+
+func T(key string) string {
+	if cu, ok := currentLang[key]; ok {
+		return cu
+	} else {
+		return fmt.Sprintf("missing transtation['%s']", key)
+	}
 }

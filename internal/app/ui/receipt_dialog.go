@@ -38,7 +38,7 @@ func (rd *ReceiptDialog) Build() dialog.Dialog {
 
 	valueBind := binding.NewString()
 	valueW := widget.NewEntryWithData(valueBind)
-	valueW.SetPlaceHolder(translate.T["amount"])
+	valueW.SetPlaceHolder(translate.T("amount"))
 
 	years := []string{}
 	for y := range ratesByYears {
@@ -51,7 +51,7 @@ func (rd *ReceiptDialog) Build() dialog.Dialog {
 		valueW.SetText(fmt.Sprintf("%.2f", ratesByYears[s]))
 	})
 
-	yearW.PlaceHolder = translate.T["selectYearPromt"]
+	yearW.PlaceHolder = translate.T("selectYearPromt")
 
 	formItems := []*widget.FormItem{
 		widget.NewFormItem("", yearW),
@@ -59,9 +59,9 @@ func (rd *ReceiptDialog) Build() dialog.Dialog {
 	}
 
 	return dialog.NewForm(
-		translate.T["paymentFormName"],
-		translate.T["create"],
-		translate.T["cancel"],
+		translate.T("paymentFormName"),
+		translate.T("create"),
+		translate.T("cancel"),
 		formItems,
 		rd.receiptHandlerFunc(rd.garageNumber, yearStr, valueBind),
 		rd.window,

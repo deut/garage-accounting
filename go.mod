@@ -3,13 +3,15 @@ module github.com/deut/garage-accounting
 go 1.21.3
 
 require (
+	fyne.io/fyne v1.4.3
+	fyne.io/fyne/v2 v2.4.1
 	github.com/glebarez/sqlite v1.10.0
+	github.com/go-playground/validator v9.31.0+incompatible
+	go.uber.org/zap v1.26.0
 	gorm.io/gorm v1.25.5
 )
 
 require (
-	fyne.io/fyne v1.4.3 // indirect
-	fyne.io/fyne/v2 v2.4.1 // indirect
 	fyne.io/systray v1.10.1-0.20230722100817-88df1e0ffa9a // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -24,7 +26,6 @@ require (
 	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20221017161538-93cebf72946b // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator v9.31.0+incompatible // indirect
 	github.com/go-playground/validator/v10 v10.16.0 // indirect
 	github.com/go-text/render v0.0.0-20230619120952-35bccb6164b8 // indirect
 	github.com/go-text/typesetting v0.0.0-20230616162802-9c17dd34aa4a // indirect
@@ -44,7 +45,6 @@ require (
 	github.com/tevino/abool v1.2.0 // indirect
 	github.com/yuin/goldmark v1.5.5 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.26.0 // indirect
 	golang.org/x/crypto v0.12.0 // indirect
 	golang.org/x/image v0.11.0 // indirect
 	golang.org/x/mobile v0.0.0-20230531173138-3c911d8e3eda // indirect
